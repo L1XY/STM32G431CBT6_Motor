@@ -106,7 +106,7 @@ int main(void)
 		{
 		  voltage[i] = adc_dma_buffer[i] * 3.3f / 4095.0f;
 		}
-		debug("CH1:%.2fV | CH2:%.2fV | CH3:%.2fV | CH4:%.2fV\r\n", voltage[0], voltage[1], voltage[2], voltage[3]);
+		debug("CH1:%.6fV | CH2:%.6fV | CH3:%.6fV | CH4:%.6fV\r\n", voltage[0], voltage[1], voltage[2], voltage[3]);
 		HAL_Delay(200);
 
     /* USER CODE END WHILE */
