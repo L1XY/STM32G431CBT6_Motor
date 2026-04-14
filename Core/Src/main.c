@@ -18,6 +18,7 @@
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
+#include "adc.h"
 #include "dma.h"
 #include "tim.h"
 #include "usart.h"
@@ -68,7 +69,7 @@ int main(void)
 {
 
   /* USER CODE BEGIN 1 */
-  uint8_t x = 0U;
+  float voltage[4];
   /* USER CODE END 1 */
 
   /* MCU Configuration--------------------------------------------------------*/
@@ -92,6 +93,7 @@ int main(void)
   MX_DMA_Init();
   MX_TIM6_Init();
   MX_USART1_UART_Init();
+  MX_ADC1_Init();
   /* USER CODE BEGIN 2 */
 
   /* USER CODE END 2 */
@@ -100,9 +102,13 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-    x++;
-    debug("Current x = %d\n", x);
-    HAL_Delay(500);
+    for(uint8_t i = 0U; i < 4U; i++)
+		{
+		  voltage[i] = adc_dma_buffer[i] * 3.3f / 4095.0f;
+		}
+		debug("CH1:%.2fV | CH2:%.2fV | CH3:%.2fV | CH4:%.2fV\r\n", voltage[0], voltage[1], voltage[2], voltage[3]);
+		HAL_Delay(200);
+
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
