@@ -58,7 +58,32 @@ void SystemClock_Config(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
+void Motor_SetDuty(uint16_t duty)
+{
+  if(duty > 7999) duty = 7999;
+  __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_1, duty);
+  __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_2, duty);
+  __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_3, duty);
+}
+void Motor_CheckBreak(void)
+{
+  if(__HAL_TIM_GET_FLAG(&htim1, TIM_FLAG_BREAK) != RESET)
+  {
+    if(HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_12) == GPIO_PIN_SET)
+    {
+      __HAL_TIM_CLEAR_FLAG(&htim1, TIM_FLAG_BREAK);
 
+      HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_1);
+      HAL_TIMEx_PWMN_Start(&htim1, TIM_CHANNEL_1);
+      HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_2);
+      HAL_TIMEx_PWMN_Start(&htim1, TIM_CHANNEL_2);
+      HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_3);
+      HAL_TIMEx_PWMN_Start(&htim1, TIM_CHANNEL_3);
+
+      debug("Break Release!\r\n");
+    }
+  }
+}
 /* USER CODE END 0 */
 
 /**
@@ -69,7 +94,7 @@ int main(void)
 {
 
   /* USER CODE BEGIN 1 */
-  float voltage[4];
+  uint16_t pwm_duty = 4000;
   /* USER CODE END 1 */
 
   /* MCU Configuration--------------------------------------------------------*/
@@ -94,6 +119,7 @@ int main(void)
   MX_TIM6_Init();
   MX_USART1_UART_Init();
   MX_ADC1_Init();
+  MX_TIM1_Init();
   /* USER CODE BEGIN 2 */
 
   /* USER CODE END 2 */
@@ -102,12 +128,9 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-    for(uint8_t i = 0U; i < 4U; i++)
-		{
-		  voltage[i] = adc_dma_buffer[i] * 3.3f / 4095.0f;
-		}
-		debug("CH1:%.6fV | CH2:%.6fV | CH3:%.6fV | CH4:%.6fV\r\n", voltage[0], voltage[1], voltage[2], voltage[3]);
-		HAL_Delay(200);
+    Motor_CheckBreak();
+    Motor_SetDuty(pwm_duty);
+    HAL_Delay(50);
 
     /* USER CODE END WHILE */
 
