@@ -20,6 +20,7 @@
 #include "main.h"
 #include "adc.h"
 #include "dma.h"
+#include "fdcan.h"
 #include "tim.h"
 #include "usart.h"
 #include "gpio.h"
@@ -94,7 +95,7 @@ int main(void)
 {
 
   /* USER CODE BEGIN 1 */
-  uint16_t pwm_duty = 4000;
+  uint8_t i;
   /* USER CODE END 1 */
 
   /* MCU Configuration--------------------------------------------------------*/
@@ -120,6 +121,7 @@ int main(void)
   MX_USART1_UART_Init();
   MX_ADC1_Init();
   MX_TIM1_Init();
+  MX_FDCAN1_Init();
   /* USER CODE BEGIN 2 */
 
   /* USER CODE END 2 */
@@ -128,9 +130,12 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-    Motor_CheckBreak();
-    Motor_SetDuty(pwm_duty);
-    HAL_Delay(50);
+    i++;
+    TxData[0] = i;
+    FDCAN_Send_Frame(0x666, TxData, 8);
+    FDCAN_Send_Frame(0x333, TxData, 4);
+    debug("FDCAN_Send_Frame !\r\n");
+    HAL_Delay(500);
 
     /* USER CODE END WHILE */
 
