@@ -21,6 +21,7 @@
 #include "adc.h"
 #include "dma.h"
 #include "fdcan.h"
+#include "i2c.h"
 #include "tim.h"
 #include "usart.h"
 #include "gpio.h"
@@ -95,7 +96,8 @@ int main(void)
 {
 
   /* USER CODE BEGIN 1 */
-  uint8_t i;
+  uint8_t Data[2];
+  float Angle;
   /* USER CODE END 1 */
 
   /* MCU Configuration--------------------------------------------------------*/
@@ -122,6 +124,7 @@ int main(void)
   MX_ADC1_Init();
   MX_TIM1_Init();
   MX_FDCAN1_Init();
+  MX_I2C1_Init();
   /* USER CODE BEGIN 2 */
 
   /* USER CODE END 2 */
@@ -130,12 +133,10 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-    i++;
-    TxData[0] = i;
-    FDCAN_Send_Frame(0x666, TxData, 8);
-    FDCAN_Send_Frame(0x333, TxData, 4);
-    debug("FDCAN_Send_Frame !\r\n");
-    HAL_Delay(500);
+    HAL_I2C_Mem_Read(&hi2c1, 0x6C, 0x0C, I2C_MEMADD_SIZE_8BIT, Data, 2, 1);
+    Angle = ((Data[0] << 8) | Data[1]) * 360.0f / 4096.0f;
+    debug("---%.2f---", Angle);
+    HAL_Delay(50);
 
     /* USER CODE END WHILE */
 
