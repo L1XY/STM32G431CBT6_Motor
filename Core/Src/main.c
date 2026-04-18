@@ -29,6 +29,7 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "debug.h"
+#include "arm_math.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -96,8 +97,7 @@ int main(void)
 {
 
   /* USER CODE BEGIN 1 */
-  uint8_t Data[2];
-  float Angle;
+  float testData;
   /* USER CODE END 1 */
 
   /* MCU Configuration--------------------------------------------------------*/
@@ -133,9 +133,8 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-    HAL_I2C_Mem_Read(&hi2c1, 0x6C, 0x0C, I2C_MEMADD_SIZE_8BIT, Data, 2, 1);
-    Angle = ((Data[0] << 8) | Data[1]) * 360.0f / 4096.0f;
-    debug("---%.2f---", Angle);
+    testData = arm_sin_f32(3.1415926535897932384626/4); // sin(PI/4)
+    debug("---%.6f---", testData);
     HAL_Delay(50);
 
     /* USER CODE END WHILE */
