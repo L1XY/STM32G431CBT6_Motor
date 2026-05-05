@@ -1,3 +1,5 @@
-../Core/Src/main.c:67:5:main	2
-../Core/Src/main.c:120:6:SystemClock_Config	3
-../Core/Src/main.c:169:6:Error_Handler	1
+../Core/Src/main.c:60:6:Motor_SetDuty	2
+../Core/Src/main.c:67:6:Motor_CheckBreak	4
+../Core/Src/main.c:92:5:main	1
+../Core/Src/main.c:159:6:SystemClock_Config	3
+../Core/Src/main.c:208:6:Error_Handler	1

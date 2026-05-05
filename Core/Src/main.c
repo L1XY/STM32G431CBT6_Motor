@@ -57,7 +57,32 @@ void SystemClock_Config(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
+void Motor_SetDuty(uint16_t duty)
+{
+  if(duty > 7999) duty = 7999;
+  __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_1, duty);
+  __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_2, duty);
+  __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_3, duty);
+}
+void Motor_CheckBreak(void)
+{
+  if(__HAL_TIM_GET_FLAG(&htim1, TIM_FLAG_BREAK) != RESET)
+  {
+    if(HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_12) == GPIO_PIN_SET)
+    {
+      __HAL_TIM_CLEAR_FLAG(&htim1, TIM_FLAG_BREAK);
 
+      HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_1);
+      HAL_TIMEx_PWMN_Start(&htim1, TIM_CHANNEL_1);
+      HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_2);
+      HAL_TIMEx_PWMN_Start(&htim1, TIM_CHANNEL_2);
+      HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_3);
+      HAL_TIMEx_PWMN_Start(&htim1, TIM_CHANNEL_3);
+
+      debug("Break Release!\r\n");
+    }
+  }
+}
 /* USER CODE END 0 */
 
 /**
@@ -92,8 +117,16 @@ int main(void)
   MX_DMA_Init();
   MX_TIM6_Init();
   MX_USART1_UART_Init();
+  MX_TIM1_Init();
   /* USER CODE BEGIN 2 */
   HAL_TIM_Base_Start_IT(&htim6);
+  HAL_TIM_Base_Start(&htim1);
+  HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_1);
+  HAL_TIMEx_PWMN_Start(&htim1, TIM_CHANNEL_1);
+  HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_2);
+  HAL_TIMEx_PWMN_Start(&htim1, TIM_CHANNEL_2);
+  HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_3);
+  HAL_TIMEx_PWMN_Start(&htim1, TIM_CHANNEL_3);
 
   /* USER CODE END 2 */
 
@@ -101,11 +134,17 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
+#if 0
     static float x = 0.0f;
     x += 0.01f;
     debug("Current x = %.2f\t\n", x);
     HAL_Delay(100);
+#endif
 
+    static uint16_t pwm_duty = 4000;
+    Motor_CheckBreak();
+    Motor_SetDuty(pwm_duty);
+    HAL_Delay(50);
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
