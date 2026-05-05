@@ -52,6 +52,12 @@ default.size.stdout \
 OBJDUMP_LIST += \
 STM32G431CBT6_Motor.list \
 
+OBJCOPY_HEX += \
+STM32G431CBT6_Motor.hex \
+
+OBJCOPY_SREC += \
+STM32G431CBT6_Motor.srec \
+
 
 # All Target
 all: main-build
@@ -75,12 +81,22 @@ STM32G431CBT6_Motor.list: $(EXECUTABLES) makefile objects.list $(OPTIONAL_TOOL_D
 	@echo 'Finished building: $@'
 	@echo ' '
 
+STM32G431CBT6_Motor.hex: $(EXECUTABLES) makefile objects.list $(OPTIONAL_TOOL_DEPS)
+	arm-none-eabi-objcopy  -O ihex $(EXECUTABLES) "STM32G431CBT6_Motor.hex"
+	@echo 'Finished building: $@'
+	@echo ' '
+
+STM32G431CBT6_Motor.srec: $(EXECUTABLES) makefile objects.list $(OPTIONAL_TOOL_DEPS)
+	arm-none-eabi-objcopy  -O srec $(EXECUTABLES) "STM32G431CBT6_Motor.srec"
+	@echo 'Finished building: $@'
+	@echo ' '
+
 # Other Targets
 clean:
-	-$(RM) STM32G431CBT6_Motor.elf STM32G431CBT6_Motor.list STM32G431CBT6_Motor.map default.size.stdout
+	-$(RM) STM32G431CBT6_Motor.elf STM32G431CBT6_Motor.hex STM32G431CBT6_Motor.list STM32G431CBT6_Motor.map STM32G431CBT6_Motor.srec default.size.stdout
 	-@echo ' '
 
-secondary-outputs: $(SIZE_OUTPUT) $(OBJDUMP_LIST)
+secondary-outputs: $(SIZE_OUTPUT) $(OBJDUMP_LIST) $(OBJCOPY_HEX) $(OBJCOPY_SREC)
 
 fail-specified-linker-script-missing:
 	@echo 'Error: Cannot find the specified linker script. Check the linker settings in the build configuration.'
